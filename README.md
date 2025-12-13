@@ -4,7 +4,7 @@ A full-stack web application with a Svelte + Vite frontend and Express.js REST A
 
 ## Project Structure
 
-```
+```plaintext
 hsf-kiosk/
 ├── frontend/          # Svelte + Vite frontend application
 ├── backend/           # Express.js REST API
@@ -31,18 +31,21 @@ This will install all dependencies for both frontend and backend.
 ### Manual Installation
 
 1. **Install Backend Dependencies:**
+
    ```bash
    cd backend
    npm install
    ```
 
 2. **Install Frontend Dependencies:**
+
    ```bash
    cd frontend
    npm install
    ```
 
 3. **Create Backend Environment File:**
+
    ```bash
    cd backend
    cp .env.example .env
@@ -94,7 +97,7 @@ The production build will be in `frontend/dist/`
 
 ## Deployment
 
-### Prerequisites
+### Prerequisites - Deployment
 
 - NGINX installed on your server
 - Node.js installed on your server
@@ -107,6 +110,7 @@ The production build will be in `frontend/dist/`
 ```
 
 This script will:
+
 1. Build the frontend
 2. Copy NGINX configuration
 3. Reload NGINX
@@ -114,18 +118,21 @@ This script will:
 ### Manual Deployment
 
 1. **Build the frontend:**
+
    ```bash
    cd frontend
    npm run build
    ```
 
 2. **Copy files to web server:**
+  
    ```bash
    sudo cp -r frontend/dist/* /var/www/hsf-kiosk/frontend/dist/
    sudo cp -r backend /var/www/hsf-kiosk/
    ```
 
 3. **Configure NGINX:**
+
    ```bash
    sudo cp scripts/nginx.conf /etc/nginx/sites-available/hsf-kiosk
    sudo ln -s /etc/nginx/sites-available/hsf-kiosk /etc/nginx/sites-enabled/
@@ -134,6 +141,7 @@ This script will:
    ```
 
 4. **Setup Backend Service (Optional):**
+
    ```bash
    sudo cp scripts/hsf-kiosk-backend.service /etc/systemd/system/
    sudo systemctl daemon-reload
@@ -144,6 +152,7 @@ This script will:
 ### NGINX Configuration
 
 The NGINX configuration file (`scripts/nginx.conf`) includes:
+
 - Static file serving for the frontend
 - Reverse proxy for the backend API at `/api/`
 - Gzip compression
@@ -156,7 +165,7 @@ The NGINX configuration file (`scripts/nginx.conf`) includes:
 
 ### Backend (.env)
 
-```
+```plaintext
 PORT=3000
 NODE_ENV=development
 ```
@@ -172,16 +181,19 @@ NODE_ENV=development
 ## Technology Stack
 
 ### Frontend
+
 - **Svelte 5** - Component framework
 - **Vite 7** - Build tool and dev server
 - **Rolldown** - Fast bundler
 
 ### Backend
+
 - **Express.js** - Web framework
 - **CORS** - Cross-origin resource sharing
 - **dotenv** - Environment variable management
 
-### Deployment
+### Deployment (Linux)
+
 - **NGINX** - Web server and reverse proxy
 - **Systemd** - Service management (optional)
 
@@ -196,13 +208,19 @@ NODE_ENV=development
 ## API Proxy
 
 The frontend development server is configured to proxy API requests to the backend:
+
 - Frontend: `http://localhost:5173`
 - Backend API: `http://localhost:3000/api`
 - Proxy: Requests to `/api/*` are forwarded to the backend
 
 ## License
 
-ISC
+Code: ISC
+
+Assets:
+
+- `frontend/public/assets/`: CC-BY-SA-4.0
+- `frontend/public/external/`: private/third-party, not licensed; integrate manually.
 
 ## Contributing
 
