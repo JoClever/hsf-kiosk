@@ -168,6 +168,7 @@ The NGINX configuration file (`scripts/nginx.conf`) includes:
 ```plaintext
 PORT=3000
 NODE_ENV=development
+BASE_DIR=/srv/hsf-kiosk
 ```
 
 ## Scripts
