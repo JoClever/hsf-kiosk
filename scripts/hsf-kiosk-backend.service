@@ -4,9 +4,11 @@ After=network.target
 
 [Service]
 Type=simple
-User=www-data
-WorkingDirectory=/var/www/hsf-kiosk/backend
+User=nginx
+WorkingDirectory=/opt/hsf-kiosk
 Environment=NODE_ENV=production
+# Optional: point to your backend .env
+# EnvironmentFile=/opt/hsf-kiosk/.env
 ExecStart=/usr/bin/node src/server.js
 Restart=on-failure
 RestartSec=10

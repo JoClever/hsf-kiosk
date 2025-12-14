@@ -9,7 +9,7 @@
 			Your browser does not support the video tag.
 		</video> -->
 		<img
-			src="/assets/Gerhard-Chefkoch.png"
+			src="/external/Gerhard-Chefkoch.png"
 			alt="Screensaver"
 			class="w-full h-full object-cover"
 		/>

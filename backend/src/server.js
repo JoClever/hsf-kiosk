@@ -8,7 +8,10 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const BASE_DIR = process.env.BASE_DIR || '/srv/hsf-kiosk';
+// Prefer FILES_DIR, fallback to legacy BASE_DIR for backward compatibility
+const FILES_DIR = process.env.FILES_DIR || process.env.BASE_DIR || '/mnt/hsf-kiosk-files';
+
+console.log(`Using FILES_DIR: ${FILES_DIR}`);
 
 // Middleware
 app.use(cors());
@@ -18,7 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 // API für Dateiliste
 app.get("/api/files", (req, res) => {
 	const categoryQuery = req.query.category;
-	const templatePath = path.join(BASE_DIR, "template.json");
+	const templatePath = path.join(FILES_DIR, "template.json");
 	if (!fs.existsSync(templatePath)) return res.json([]);
 
 	const templateData = JSON.parse(fs.readFileSync(templatePath, "utf8"));
@@ -53,7 +56,7 @@ app.get("/api/files", (req, res) => {
 			(item) => item.directory === categoryQuery || item.display_name === categoryQuery
 		);
 		if (!entry) return res.json([]);
-		const catDir = path.join(BASE_DIR, entry.directory);
+		const catDir = path.join(FILES_DIR, entry.directory);
 		if (!fs.existsSync(catDir)) return res.json([]);
 		const files = fs.readdirSync(catDir)
 			.filter((file) => fs.statSync(path.join(catDir, file)).isFile())
@@ -82,7 +85,7 @@ app.get("/api/files", (req, res) => {
 			// For embedded content without files
 			if (!entry.directory) return { display_name: entry.display_name };
 
-			const catDir = path.join(BASE_DIR, entry.directory);
+			const catDir = path.join(FILES_DIR, entry.directory);
 			let files = [];
 			if (fs.existsSync(catDir)) {
 				files = fs.readdirSync(catDir)

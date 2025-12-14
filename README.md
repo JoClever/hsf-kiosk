@@ -97,6 +97,24 @@ The production build will be in `frontend/dist/`
 
 ## Deployment
 
+### Global Deployment Config (.env)
+
+Create a `.env` in the repo root (or copy `.env.example`) to configure deploy targets:
+
+```bash
+APP_NAME=hsf-kiosk
+BACKEND_DIR=/opt/${APP_NAME}
+FRONTEND_DIR=/srv/${APP_NAME}
+FILES_DIR=/mnt/${APP_NAME}-files
+NGINX_PORT=80
+NODE_PORT=3000
+SERVER_NAME=your-domain.com
+```
+
+Defaults are used if variables are absent.
+
+**Files mount:** `FILES_DIR` should point to the mounted content location (WebDAV, NFS, or SMB). Mount it before deploying so the backend can read `template.json` and files.
+
 ### Prerequisites - Deployment
 
 - NGINX installed on your server
@@ -111,9 +129,32 @@ The production build will be in `frontend/dist/`
 
 This script will:
 
-1. Build the frontend
-2. Copy NGINX configuration
-3. Reload NGINX
+1. Load `.env` (or defaults) for directories and ports
+2. Build the frontend
+3. Sync frontend to `$FRONTEND_DIR` and backend to `$BACKEND_DIR`
+4. Render `nginx.conf` with `envsubst` and install it as `/etc/nginx/sites-available/$APP_NAME`
+5. Test and reload NGINX
+
+### Update Procedure (production)
+
+1. Pull latest code and install deps (from repo root):
+
+   ```bash
+   git pull
+   npm install
+   cd frontend && npm install && cd ..
+   cd backend && npm install && cd ..
+   ```
+
+2. Ensure files mount is present at `FILES_DIR` (see `.env`).
+
+3. Redeploy:
+
+   ```bash
+   ./scripts/deploy.sh
+   ```
+
+This rebuilds the frontend, syncs backend/frontend to the configured targets, renders NGINX config, tests, and reloads NGINX.
 
 ### Manual Deployment
 
@@ -127,8 +168,8 @@ This script will:
 2. **Copy files to web server:**
   
    ```bash
-   sudo cp -r frontend/dist/* /var/www/hsf-kiosk/frontend/dist/
-   sudo cp -r backend /var/www/hsf-kiosk/
+   sudo rsync -a frontend/dist/ /srv/hsf-kiosk/
+   sudo rsync -a backend/ /opt/hsf-kiosk/ --exclude node_modules
    ```
 
 3. **Configure NGINX:**
@@ -168,16 +209,18 @@ The NGINX configuration file (`scripts/nginx.conf`) includes:
 ```plaintext
 PORT=3000
 NODE_ENV=development
-BASE_DIR=/srv/hsf-kiosk
+FILES_DIR=/mnt/hsf-kiosk-files
 ```
+
+Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path must be where your files mount is available (WebDAV/NFS/SMB).
 
 ## Scripts
 
-- `scripts/install.sh` - Install all dependencies
-- `scripts/build.sh` - Build frontend for production
-- `scripts/deploy.sh` - Deploy to production server
-- `scripts/nginx.conf` - NGINX server configuration
-- `scripts/hsf-kiosk-backend.service` - Systemd service for backend
+- `scripts/install.sh`                 - Install all dependencies
+- `scripts/build.sh`                   - Build frontend for production
+- `scripts/deploy.sh`                  - Deploy to production server
+- `scripts/nginx.conf`                 - NGINX server configuration
+- `scripts/hsf-kiosk-backend.service`  - Systemd service for backend
 
 ## Technology Stack
 

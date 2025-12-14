@@ -5,5 +5,5 @@
 </script>
 
 <button class={classes} aria-pressed={active} {onclick}>
-	<img class="" src="/assets/{category}.png" alt={category} />
+	<img class="" src="/external/{category}.png" alt={category} />
 </button>
