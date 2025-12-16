@@ -1,7 +1,7 @@
 <script>
 	import NavigationBtn from "./NavigationBtn.svelte";
 
-	let { activeCat = $bindable(), activeDoc = $bindable(), categories = []} = $props();
+	let { activeCat = $bindable(null), activeDoc = $bindable(null), categories = []} = $props();
 
 	let changeCat = (cat) => {
 		activeCat = cat;
