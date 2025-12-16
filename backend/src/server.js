@@ -77,13 +77,25 @@ app.get("/api/files", (req, res) => {
 				}
 				return fileData;
 			});
-		result = { display_name: entry.display_name, files };
+		result = {
+			id: entry.id || entry.directory,
+			display_name: entry.display_name,
+			type: entry.type || "documents",
+			files
+		};
 	} else {
 		// Scan all directories from template.json
 		result = templateData.map((entry) => {
-
-			// For embedded content without files
-			if (!entry.directory) return { display_name: entry.display_name };
+			// For entries without directory (iframe, placeholder)
+			if (!entry.directory) {
+				return {
+					id: entry.id || `page-${templateData.indexOf(entry)}`,
+					display_name: entry.display_name,
+					type: entry.type || "placeholder",
+					url: entry.url || null,
+					files: []
+				};
+			}
 
 			const catDir = path.join(FILES_DIR, entry.directory);
 			let files = [];
@@ -108,10 +120,15 @@ app.get("/api/files", (req, res) => {
 						return fileData;
 					});
 			}
-			return { display_name: entry.display_name, files };
+			return {
+				id: entry.id || entry.directory,
+				display_name: entry.display_name,
+				type: entry.type || "documents",
+				url: entry.url || null,
+				files
+			};
 		});
 	}
-
 	res.json(result);
 });
 

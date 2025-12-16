@@ -1,7 +1,7 @@
 {
   "name": "hsf-kiosk-backend",
   "version": "1.0.0",
-  "description": "Express.js REST API for HSF Kiosk",
+  "description": "Express.js REST API for HSF-Kiosk WebApp",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -12,8 +12,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.21.2",
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7"
+    "express": "npm:express@latest",
+    "cors": "npm:cors@latest",
+    "dotenv": "npm:dotenv@latest"
   }
 }
