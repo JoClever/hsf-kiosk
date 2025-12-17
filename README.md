@@ -263,7 +263,7 @@ Code: ISC
 
 Assets:
 
-- `frontend/public/assets/`: CC-BY-SA-4.0
+- `frontend/public/assets/icons`: CC0-1.0 (Public Domain)
 - `frontend/public/external/`: private/third-party, not licensed; integrate manually.
 
 ## Contributing

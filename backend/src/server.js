@@ -81,6 +81,8 @@ app.get("/api/files", (req, res) => {
 			id: entry.id || entry.directory,
 			display_name: entry.display_name,
 			type: entry.type || "documents",
+			url: entry.url || null,
+			icon: entry.icon || null,
 			files
 		};
 	} else {
@@ -93,6 +95,7 @@ app.get("/api/files", (req, res) => {
 					display_name: entry.display_name,
 					type: entry.type || "placeholder",
 					url: entry.url || null,
+					icon: entry.icon || null,
 					files: []
 				};
 			}
@@ -125,6 +128,7 @@ app.get("/api/files", (req, res) => {
 				display_name: entry.display_name,
 				type: entry.type || "documents",
 				url: entry.url || null,
+				icon: entry.icon || null,
 				files
 			};
 		});
