@@ -49,5 +49,5 @@
 			<ErrorFrame message={"Fehler beim Laden der Dateien: " + error.message} />
 		{/await}
 	</main>
-	<ScreenSaver {idle} />
+	<ScreenSaver {idle} onInteraction={resetInactivityTimer} />
 </div>

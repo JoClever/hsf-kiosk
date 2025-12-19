@@ -1,17 +1,25 @@
 <script>
-	let { idle = false } = $props();
+	let { idle = false, onInteraction = () => {} } = $props();
+	const screensaverUrl = import.meta.env.VITE_SCREENSAVER_URL || "/screensaver/";
 </script>
 
 {#if idle}
 	<div class="absolute top-0 left-0 w-dvw h-dvh z-50">
-		<!-- <video autoplay muted loop class="w-full h-full object-cover">
-			<source src="/assets/HSF-Imagefilm 2019.mp4" type="video/mp4" />
-			Your browser does not support the video tag.
-		</video> -->
-		<img
-			src="/external/Gerhard-Chefkoch.png"
-			alt="Screensaver"
-			class="w-full h-full object-cover"
-		/>
+		<iframe
+			title="MagicMirror2"
+			src={screensaverUrl}
+			class="w-full h-full"
+			frameborder="0"
+			allowfullscreen
+		></iframe>
+		<!-- Transparentes Overlay, um Events abzufangen -->
+		<div 
+			class="absolute top-0 left-0 w-full h-full cursor-default"
+			onmousemove={onInteraction}
+			ontouchstart={onInteraction}
+			role="button"
+			tabindex="0"
+			aria-label="Screensaver beenden"
+		></div>
 	</div>
 {/if}
