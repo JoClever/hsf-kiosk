@@ -8,12 +8,18 @@
     "start": "node src/server.js",
     "dev": "node --watch src/server.js"
   },
-  "keywords": ["express", "rest", "api"],
+  "keywords": [
+    "express",
+    "rest",
+    "api"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "express": "npm:express@latest",
     "cors": "npm:cors@latest",
-    "dotenv": "npm:dotenv@latest"
+    "dotenv": "npm:dotenv@latest",
+    "express": "npm:express@latest",
+    "ical": "npm:ical@latest",
+    "node-fetch": "npm:node-fetch@latest"
   }
 }

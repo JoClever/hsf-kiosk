@@ -4,12 +4,13 @@
 	import Navigation from "./lib/Navigation.svelte";
 	import FilesFrame from "./lib/FilesFrame.svelte";
 	import IFrame from "./lib/IFrame.svelte";
+	import CalendarFrame from "./lib/CalendarFrame.svelte";
 	import EmptyFrame from "./lib/EmptyFrame.svelte";
 	import ErrorFrame from "./lib/ErrorFrame.svelte";
 	import ScreenSaver from "./lib/ScreenSaver.svelte";
 	import {fetchJSON} from "./lib/utils.js";
 
-	let fetchFiles = $state(fetchJSON("files"));
+	let fetchFiles = $state(fetchJSON("navigation"));
 	
 	let activeCat = $state(null);
 	let activeDoc = $state(null);
@@ -37,6 +38,11 @@
 			{#each categories as category}
 				{#if category.type === "iframe"}
 					<IFrame title={category.display_name} url={category.url} active={activeCat?.display_name === category.display_name} />
+				{/if}
+				{#if category.type === "calendar"}
+					{#if activeCat?.display_name === category.display_name}
+						<CalendarFrame page={category} />
+					{/if}
 				{/if}
 			{/each}
 			{#if activeCat === null}

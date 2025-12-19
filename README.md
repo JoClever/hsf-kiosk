@@ -77,6 +77,8 @@ The frontend will be available at `http://localhost:5173`
 - `GET /api/health` - Health check endpoint
 - `GET /api` - Welcome message
 - `GET /api/data` - Example data endpoint
+- `GET /api/navigation` - Get navigation structure with files and calendar events from template.json
+- `GET /api/calendar/:calendarId` - Fetch and parse iCal calendar events (optional, for direct access)
 
 ## Production Build
 
@@ -210,9 +212,45 @@ The NGINX configuration file (`scripts/nginx.conf`) includes:
 PORT=3000
 NODE_ENV=development
 FILES_DIR=/mnt/hsf-kiosk-files
+
+# Calendar URLs (configured in template.json with url_env field)
+# Example: CALENDAR_HSF=https://example.com/calendar.ics
+CALENDAR_HSF=
+CALENDAR_EVENTS=
 ```
 
 Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path must be where your files mount is available (WebDAV/NFS/SMB).
+
+### Calendar Configuration
+
+Calendar pages are configured in `template.json` and require corresponding environment variables in `backend/.env`:
+
+1. **In template.json:**
+   ```json
+   {
+     "id": "termine",
+     "type": "calendar",
+     "display_name": "Termine",
+     "calendars": [
+       {
+         "name": "HSF Kalender",
+         "url_env": "CALENDAR_HSF"
+       },
+       {
+         "name": "Events",
+         "url_env": "CALENDAR_EVENTS"
+       }
+     ]
+   }
+   ```
+
+2. **In backend/.env:**
+   ```plaintext
+   CALENDAR_HSF=https://example.com/hsf-calendar.ics
+   CALENDAR_EVENTS=https://example.com/events.ics
+   ```
+
+The backend will fetch and parse iCal files from the configured URLs and provide the next 20 upcoming events per calendar.
 
 ## Scripts
 
