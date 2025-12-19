@@ -353,22 +353,18 @@ See [scripts/template.json.example](scripts/template.json.example) for a full wo
 
 ## Technology Stack
 
-### Frontend
-
-- **Svelte 5** - Component framework
-- **Vite 7** - Build tool and dev server
-- **Rolldown** - Fast bundler
-
-### Backend
-
-- **Express.js** - Web framework
-- **CORS** - Cross-origin resource sharing
-- **dotenv** - Environment variable management
-
-### Deployment (Linux)
-
-- **NGINX** - Web server and reverse proxy
-- **Systemd** - Service management (optional)
+| Layer | Technology | Purpose |
+|-------|------------|---------|
+| **Frontend** | Svelte 5 | Component framework |
+| | Vite 7 | Build tool and dev server |
+| | Rolldown | Fast bundler |
+| **Backend** | Express.js | Web framework |
+| | CORS | Cross-origin resource sharing |
+| | dotenv | Environment variable management |
+| | ical | iCal calendar parsing |
+| | node-fetch | HTTP requests |
+| **Deployment** | NGINX | Web server and reverse proxy |
+| | Systemd | Service management (optional) |
 
 ## Development Guidelines
 
