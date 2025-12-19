@@ -252,6 +252,97 @@ Calendar pages are configured in `template.json` and require corresponding envir
 
 The backend will fetch and parse iCal files from the configured URLs and provide the next 20 upcoming events per calendar.
 
+## Content Configuration (template.json)
+
+The application's navigation structure, pages, and content sources are configured via `template.json` in the `FILES_DIR` directory. This file defines what appears in the navigation and how content is displayed.
+
+**Location:** `${FILES_DIR}/template.json` (e.g., `/mnt/hsf-kiosk-files/template.json`)
+
+**Example:** See [scripts/template.json.example](scripts/template.json.example) for a complete reference.
+
+### Page Types
+
+#### 1. Documents Page (`type: "documents"`)
+
+Displays a list of files from a specific directory.
+
+```json
+{
+  "id": "aktuelles",
+  "display_name": "Aktuelles",
+  "type": "documents",
+  "directory": "Aktuelles",
+  "icon": "advertising",
+  "files": [
+    {
+      "file_name": "2011-04 Example.pdf",
+      "display_name": "Custom Display Name.pdf",
+      "date": "11. April 2011"
+    }
+  ]
+}
+```
+
+- **`id`**: Unique identifier for the page
+- **`display_name`**: Name shown in navigation
+- **`type`**: Set to `"documents"`
+- **`directory`**: Folder name relative to `FILES_DIR`
+- **`icon`** (optional): Icon name for navigation button
+- **`files`** (optional): Array to override file display names and dates
+
+#### 2. IFrame Page (`type: "iframe"`)
+
+Embeds an external website in an iframe.
+
+```json
+{
+  "id": "hsf-website",
+  "display_name": "HSF-Website",
+  "type": "iframe",
+  "url": "https://hsf-ev.de",
+  "icon": "home"
+}
+```
+
+- **`url`**: External website URL to embed
+
+#### 3. Calendar Page (`type: "calendar"`)
+
+Displays upcoming events from one or more iCal calendars.
+
+```json
+{
+  "id": "termine",
+  "display_name": "Termine",
+  "type": "calendar",
+  "icon": "planner",
+  "calendars": [
+    {
+      "name": "HSF Kalender",
+      "url": "https://example.com/calendar.ics"
+    },
+    {
+      "name": "Events",
+      "url_env": "CALENDAR_EVENTS"
+    }
+  ]
+}
+```
+
+- **`calendars`**: Array of calendar sources
+  - **`name`**: Display name for the calendar
+  - **`url`**: Direct iCal URL (use for public calendars)
+  - **`url_env`**: Environment variable name containing the URL (use for private calendars)
+
+If using `url_env`, set the corresponding variable in `backend/.env`:
+```bash
+CALENDAR_EVENTS=https://example.com/private-calendar.ics
+```
+
+### Complete Example
+
+See [scripts/template.json.example](scripts/template.json.example) for a full working example with multiple page types.
+
 ## Scripts
 
 - `scripts/install.sh`                 - Install all dependencies

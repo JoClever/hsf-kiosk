@@ -1,0 +1,77 @@
+[
+	{
+		"id": "aktuelles",
+		"display_name": "Aktuelles",
+		"type": "documents",
+		"directory": "Aktuelles",
+		"icon": "advertising"
+	},
+	{
+		"id": "informationsbriefe",
+		"display_name": "Informationsbriefe",
+		"type": "documents",
+		"directory": "Informationsbriefe",
+		"icon": "news"
+	},
+	{
+		"id": "aufstellordnungen",
+		"display_name": "Aufstellordnungen",
+		"type": "documents",
+		"directory": "Aufstellordnungen",
+		"icon": "todo-list",
+        "files": [
+            {
+                "file_name": "2011-04 Sören.pdf",
+                "display_name": "Aufstellordnung alt.pdf",
+                "date": "11. April 2011"
+            }
+        ]
+	},
+	{
+		"id": "museumsdisposition",
+		"display_name": "Museumsdisposition",
+		"type": "documents",
+		"directory": "Museumsdisposition",
+		"icon": "manager"
+	},
+	{
+		"id": "regelwerk",
+		"display_name": "Regelwerk",
+		"type": "documents",
+		"directory": "Regelwerk",
+		"icon": "rules"
+	},
+	{
+		"id": "sonderfahrten",
+		"display_name": "Sonderfahrten",
+		"type": "documents",
+		"directory": "Sonderfahrten",
+		"icon": "tram"
+	},
+	{
+		"id": "hsf-website",
+		"display_name": "HSF-Website",
+		"type": "iframe",
+		"url": "https://hsf-ev.de",
+		"icon": "home"
+	},
+	{
+		"id": "netzmap",
+		"display_name": "Netzmap",
+		"type": "iframe",
+		"url": "https://halle.netzmap.com/app",
+		"icon": "globe"
+	},
+	{
+		"id": "termine",
+		"type": "calendar",
+		"display_name": "Termine",
+		"icon": "planner",
+		"calendars": [
+			{
+				"name": "HSF Kalender",
+				"url": "https://example.com/calendar.ical"
+			}
+		]
+	}
+]
