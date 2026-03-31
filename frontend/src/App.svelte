@@ -5,6 +5,7 @@
 	import FilesFrame from "./lib/FilesFrame.svelte";
 	import IFrame from "./lib/IFrame.svelte";
 	import CalendarFrame from "./lib/CalendarFrame.svelte";
+	import TicketsFrame from "./lib/TicketsFrame.svelte";
 	import EmptyFrame from "./lib/EmptyFrame.svelte";
 	import ErrorFrame from "./lib/ErrorFrame.svelte";
 	import ScreenSaver from "./lib/ScreenSaver.svelte";
@@ -42,6 +43,11 @@
 				{#if category.type === "calendar"}
 					{#if activeCat?.display_name === category.display_name}
 						<CalendarFrame page={category} />
+					{/if}
+				{/if}
+				{#if category.type === "tickets"}
+					{#if activeCat?.display_name === category.display_name}
+						<TicketsFrame page={category} />
 					{/if}
 				{/if}
 			{/each}

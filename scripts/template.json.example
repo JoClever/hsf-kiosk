@@ -73,5 +73,20 @@
 				"url": "https://example.com/calendar.ical"
 			}
 		]
+	},
+	{
+		"id": "offene-tickets",
+		"display_name": "Offene Tickets",
+		"type": "tickets",
+		"icon": "todo-list",
+		"source_name": "Zammad",
+		"url_env": "TICKETS_API_URL",
+		"token_env": "TICKETS_API_TOKEN",
+		"open_state_ids": [
+			1,
+			2,
+			3
+		],
+		"limit": 25
 	}
 ]

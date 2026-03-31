@@ -79,6 +79,7 @@ The frontend will be available at `http://localhost:5173`
 - `GET /api/data` - Example data endpoint
 - `GET /api/navigation` - Get navigation structure with files and calendar events from template.json
 - `GET /api/calendar/:calendarId` - Fetch and parse iCal calendar events (optional, for direct access)
+- `GET /api/navigation?category=<name>` - Resolve a single category (documents/calendar/tickets)
 
 ## Production Build
 
@@ -217,6 +218,10 @@ FILES_DIR=/mnt/hsf-kiosk-files
 # Example: CALENDAR_HSF=https://example.com/calendar.ics
 CALENDAR_HSF=
 CALENDAR_EVENTS=
+
+# Tickets API (configured in template.json with url_env/token_env)
+TICKETS_API_URL=
+TICKETS_API_TOKEN=
 ```
 
 Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path must be where your files mount is available (WebDAV/NFS/SMB).
@@ -226,6 +231,7 @@ Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path
 Calendar pages are configured in `template.json` and require corresponding environment variables in `backend/.env`:
 
 1. **In template.json:**
+
    ```json
    {
      "id": "termine",
@@ -245,6 +251,7 @@ Calendar pages are configured in `template.json` and require corresponding envir
    ```
 
 2. **In backend/.env:**
+
    ```plaintext
    CALENDAR_HSF=https://example.com/hsf-calendar.ics
    CALENDAR_EVENTS=https://example.com/events.ics
@@ -335,9 +342,42 @@ Displays upcoming events from one or more iCal calendars.
   - **`url_env`**: Environment variable name containing the URL (use for private calendars)
 
 If using `url_env`, set the corresponding variable in `backend/.env`:
+
 ```bash
 CALENDAR_EVENTS=https://example.com/private-calendar.ics
 ```
+
+#### 4. Tickets Page (`type: "tickets"`)
+
+Displays open tickets from a REST API via backend proxy.
+
+```json
+{
+  "id": "offene-tickets",
+  "display_name": "Offene Tickets",
+  "type": "tickets",
+  "icon": "todo-list",
+  "source_name": "Zammad",
+  "url_env": "TICKETS_API_URL",
+  "token_env": "TICKETS_API_TOKEN",
+  "open_state_ids": [1, 2, 3, 7, 8],
+  "limit": 25
+}
+```
+
+- `url` or `url_env`: Ticket API endpoint
+- `token_env`: Environment variable containing API token (Authorization: `Token token=...`)
+- `open_state_ids` (optional): Restrict open tickets by `state_id`; if omitted, all tickets without `close_at` are treated as open
+- `limit` (optional): Max number of tickets returned (default 25)
+
+If `url_env` and `token_env` are used, set them in `backend/.env`:
+
+```bash
+TICKETS_API_URL=https://todo.hsfev.duckdns.org/api/v1/tickets
+TICKETS_API_TOKEN=your-secret-token
+```
+
+Security note: Keep `TICKETS_API_TOKEN` server-side only in backend `.env`. Do not put ticket tokens into frontend `VITE_*` variables.
 
 ### Complete Example
 
@@ -353,18 +393,18 @@ See [scripts/template.json.example](scripts/template.json.example) for a full wo
 
 ## Technology Stack
 
-| Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Frontend** | Svelte 5 | Component framework |
-| | Vite 7 | Build tool and dev server |
-| | Rolldown | Fast bundler |
-| **Backend** | Express.js | Web framework |
-| | CORS | Cross-origin resource sharing |
-| | dotenv | Environment variable management |
-| | ical | iCal calendar parsing |
-| | node-fetch | HTTP requests |
-| **Deployment** | NGINX | Web server and reverse proxy |
-| | Systemd | Service management (optional) |
+|Layer|Technology|Purpose|
+|---|---|---|
+|**Frontend**|Svelte 5|Component framework|
+||Vite 7|Build tool and dev server|
+||Rolldown|Fast bundler|
+|**Backend**|Express.js|Web framework|
+||CORS|Cross-origin resource sharing|
+||dotenv|Environment variable management|
+||ical|iCal calendar parsing|
+||node-fetch|HTTP requests|
+|**Deployment**|NGINX|Web server and reverse proxy|
+||Systemd|Service management (optional)|
 
 ## Development Guidelines
 
