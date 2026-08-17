@@ -88,8 +88,8 @@ function isOpenTicket(ticket, openStateIds = []) {
 
 async function fetchTickets(entry) {
 	try {
-		const ticketUrl = entry.url || process.env[entry.url_env];
-		const ticketToken = process.env[entry.token_env];
+		const ticketUrl = entry.url;
+		const ticketToken = entry.token;
 
 		if (!ticketUrl) {
 			return {
@@ -99,7 +99,7 @@ async function fetchTickets(entry) {
 			};
 		}
 
-		if (!entry.token_env || !ticketToken) {
+		if (!ticketToken) {
 			return {
 				source_name: entry.source_name || entry.display_name,
 				tickets: [],
@@ -246,6 +246,8 @@ app.get("/api/navigation", async (req, res) => {
 					let fileData = {
 						file_name: fileName,
 						date: formatDate(stats.mtime),
+						date_iso: stats.mtime.toISOString(),   // neu: ISO-String
+						date_ts: stats.mtime.getTime(),        // neu: numeric timestamp
 						path: `/docs/${entry.directory}/${fileName}`,
 					};
 					if (entry.files) {
@@ -318,6 +320,8 @@ app.get("/api/navigation", async (req, res) => {
 								let fileData = {
 									file_name: fileName,
 									date: formatDate(stats.mtime),
+									date_iso: stats.mtime.toISOString(),   // neu: ISO-String
+									date_ts: stats.mtime.getTime(),        // neu: numeric timestamp
 									path: `/docs/${entry.directory}/${fileName}`,
 								};
 								if (entry.files) {
