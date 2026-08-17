@@ -10,7 +10,7 @@
 	{#if !documents || documents.length === 0}
 		<div class="text-lg text-stone-500 dark:text-stone-400 italic">Aktuell keine Dateien vorhanden.</div>
 	{:else}
-                {#each documents as document}
+                {#each (documents || []).slice().sort((a,b) => (b.file_name||'').localeCompare(a.file_name||'')) as document}
                 <DoclistBtn 
                         file_name={document.file_name}
                         display_name={document.display_name}
