@@ -96,4 +96,4 @@ sudo systemctl restart hsf-kiosk-backend
 
 echo ""
 echo "✅ Deployment complete!"
-echo "Your application should now be accessible via NGINX"
+echo "Your application should now be accessible via NGINX at http://${SERVER_NAME}:${NGINX_PORT}/"
