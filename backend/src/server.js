@@ -79,6 +79,93 @@ function normalizeTicket(ticket) {
 	};
 }
 
+function getFileBaseName(fileName) {
+	return path.parse(fileName).name;
+}
+
+function buildFullMatchRegExp(pattern, flags = '') {
+	return new RegExp(`^(?:${pattern})$`, flags);
+}
+
+function replaceCaptureGroups(template, match) {
+	return template.replace(/\$(\d+)/g, (_, groupIndex) => match[Number(groupIndex)] ?? '');
+}
+
+function hasAnyReferencedCaptureValue(template, match) {
+	const referencedGroups = [...template.matchAll(/\$(\d+)/g)].map((token) => Number(token[1]));
+	if (referencedGroups.length === 0) return true;
+	return referencedGroups.some((groupIndex) => {
+		const value = match[groupIndex];
+		return value !== undefined && value !== null && value !== '';
+	});
+}
+
+function applyRenamePattern(entry, fileName) {
+	const renamePatterns = toArray(entry.rename_patterns);
+	if (renamePatterns.length === 0) return null;
+
+	const candidate = getFileBaseName(fileName);
+
+	for (const rule of renamePatterns) {
+		if (!rule || typeof rule.pattern !== 'string' || rule.pattern.length === 0) {
+			continue;
+		}
+
+		let regex;
+		try {
+			regex = buildFullMatchRegExp(rule.pattern, rule.flags || '');
+		} catch (error) {
+			console.warn(`Invalid rename pattern for ${entry.display_name}:`, error.message);
+			continue;
+		}
+
+		if (!regex.test(candidate)) {
+			continue;
+		}
+
+		const match = candidate.match(regex);
+		if (!match) {
+			continue;
+		}
+
+		const displayName = typeof rule.display_name === 'string' ? replaceCaptureGroups(rule.display_name, match).trim() : null;
+		const date = typeof rule.date === 'string' && hasAnyReferencedCaptureValue(rule.date, match)
+			? replaceCaptureGroups(rule.date, match).trim()
+			: null;
+
+		return {
+			display_name: displayName,
+			date
+		};
+	}
+
+	return null;
+}
+
+function buildDocumentFileData(entry, fileName, stats) {
+	const fileData = {
+		file_name: fileName,
+		date: formatDate(stats.mtime),
+		date_iso: stats.mtime.toISOString(),
+		date_ts: stats.mtime.getTime(),
+		path: `/docs/${entry.directory}/${fileName}`,
+	};
+
+	const renamedFile = applyRenamePattern(entry, fileName);
+	if (renamedFile) {
+		if (renamedFile.display_name) fileData.display_name = renamedFile.display_name;
+		if (renamedFile.date) fileData.date = renamedFile.date;
+	}
+
+	const override = toArray(entry.files).find((item) => item.file_name === fileName);
+	if (override) {
+		if (override.display_name) fileData.display_name = override.display_name;
+		if (override.date) fileData.date = override.date;
+	}
+
+	return fileData;
+}
+
 function isOpenTicket(ticket, openStateIds = []) {
 	if (ticket.close_at) return false;
 	if (openStateIds.length === 0) return true;
@@ -240,25 +327,7 @@ app.get("/api/navigation", async (req, res) => {
 			if (!fs.existsSync(catDir)) return res.json([]);
 			const files = fs.readdirSync(catDir)
 				.filter((file) => fs.statSync(path.join(catDir, file)).isFile())
-				.map((fileName) => {
-					const filePath = path.join(catDir, fileName);
-					const stats = fs.statSync(filePath);
-					let fileData = {
-						file_name: fileName,
-						date: formatDate(stats.mtime),
-						date_iso: stats.mtime.toISOString(),   // neu: ISO-String
-						date_ts: stats.mtime.getTime(),        // neu: numeric timestamp
-						path: `/docs/${entry.directory}/${fileName}`,
-					};
-					if (entry.files) {
-						const override = entry.files.find((item) => item.file_name === fileName);
-						if (override) {
-							if (override.display_name) fileData.display_name = override.display_name;
-							if (override.date) fileData.date = override.date;
-						}
-					}
-					return fileData;
-				});
+				.map((fileName) => buildDocumentFileData(entry, fileName, fs.statSync(path.join(catDir, fileName))));
 			result = {
 				id: entry.id || entry.directory,
 				display_name: entry.display_name,
@@ -314,25 +383,7 @@ app.get("/api/navigation", async (req, res) => {
 					if (fs.existsSync(catDir)) {
 						files = fs.readdirSync(catDir)
 							.filter((file) => fs.statSync(path.join(catDir, file)).isFile())
-							.map((fileName) => {
-								const filePath = path.join(catDir, fileName);
-								const stats = fs.statSync(filePath);
-								let fileData = {
-									file_name: fileName,
-									date: formatDate(stats.mtime),
-									date_iso: stats.mtime.toISOString(),   // neu: ISO-String
-									date_ts: stats.mtime.getTime(),        // neu: numeric timestamp
-									path: `/docs/${entry.directory}/${fileName}`,
-								};
-								if (entry.files) {
-									const override = entry.files.find((item) => item.file_name === fileName);
-									if (override) {
-										if (override.display_name) fileData.display_name = override.display_name;
-										if (override.date) fileData.date = override.date;
-									}
-								}
-								return fileData;
-							});
+							.map((fileName) => buildDocumentFileData(entry, fileName, fs.statSync(path.join(catDir, fileName))));
 					}
 					return {
 						id: entry.id || entry.directory,

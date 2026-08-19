@@ -280,6 +280,13 @@ Displays a list of files from a specific directory.
   "type": "documents",
   "directory": "Aktuelles",
   "icon": "advertising",
+  "rename_patterns": [
+    {
+      "pattern": "HSF-Mitgliederinfo\\s+(\\d{4})-(\\d{2})(?:[_](\\d{4})-(\\d{2})-(\\d{2}))?(?:_(.+))?",
+      "display_name": "$1/$2 $6",
+      "date": "$5.$4.$3"
+    }
+  ],
   "files": [
     {
       "file_name": "2011-04 Example.pdf",
@@ -295,7 +302,8 @@ Displays a list of files from a specific directory.
 - **`type`**: Set to `"documents"`
 - **`directory`**: Folder name relative to `FILES_DIR`
 - **`icon`** (optional): Icon name for navigation button
-- **`files`** (optional): Array to override file display names and dates
+- **`rename_patterns`** (optional): Ordered regex rules for batch renaming by filename without extension. The first full match wins, and `display_name` may use capture groups like `$1` or `$2`.
+- **`files`** (optional): Array to override file display names and dates for exact filenames. These overrides still win over `rename_patterns`.
 
 #### 2. IFrame Page (`type: "iframe"`)
 
