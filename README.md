@@ -77,7 +77,7 @@ The frontend will be available at `http://localhost:5173`
 - `GET /api/health` - Health check endpoint
 - `GET /api` - Welcome message
 - `GET /api/data` - Example data endpoint
-- `GET /api/navigation` - Get navigation structure with files and calendar events from template.json
+- `GET /api/navigation` - Get navigation structure with files and calendar events from template.yaml (or template.yml; JSON fallback)
 - `GET /api/calendar/:calendarId` - Fetch and parse iCal calendar events (optional, for direct access)
 - `GET /api/navigation?category=<name>` - Resolve a single category (documents/calendar/tickets)
 
@@ -116,7 +116,7 @@ SERVER_NAME=your-domain.com
 
 Defaults are used if variables are absent.
 
-**Files mount:** `FILES_DIR` should point to the mounted content location (WebDAV, NFS, or SMB). Mount it before deploying so the backend can read `template.json` and files.
+**Files mount:** `FILES_DIR` should point to the mounted content location (WebDAV, NFS, or SMB). Mount it before deploying so the backend can read `template.yaml` (or `template.yml`; JSON fallback) and files.
 
 ### Prerequisites - Deployment
 
@@ -214,12 +214,12 @@ PORT=3000
 NODE_ENV=development
 FILES_DIR=/mnt/hsf-kiosk-files
 
-# Calendar URLs (configured in template.json with url_env field)
+# Calendar URLs (configured in template.yaml with url_env field)
 # Example: CALENDAR_HSF=https://example.com/calendar.ics
 CALENDAR_HSF=
 CALENDAR_EVENTS=
 
-# Tickets API (configured in template.json with url_env/token_env)
+# Tickets API (configured in template.yaml with url_env/token_env)
 TICKETS_API_URL=
 TICKETS_API_TOKEN=
 ```
@@ -228,26 +228,19 @@ Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path
 
 ### Calendar Configuration
 
-Calendar pages are configured in `template.json` and require corresponding environment variables in `backend/.env`:
+Calendar pages are configured in `template.yaml` (or `template.yml`) and require corresponding environment variables in `backend/.env`:
 
-1. **In template.json:**
+1. **In template.yaml (or template.yml):**
 
-   ```json
-   {
-     "id": "termine",
-     "type": "calendar",
-     "display_name": "Termine",
-     "calendars": [
-       {
-         "name": "HSF Kalender",
-         "url_env": "CALENDAR_HSF"
-       },
-       {
-         "name": "Events",
-         "url_env": "CALENDAR_EVENTS"
-       }
-     ]
-   }
+   ```yaml
+   - id: termine
+     type: calendar
+     display_name: Termine
+     calendars:
+       - name: HSF Kalender
+         url_env: CALENDAR_HSF
+       - name: Events
+         url_env: CALENDAR_EVENTS
    ```
 
 2. **In backend/.env:**
@@ -259,13 +252,13 @@ Calendar pages are configured in `template.json` and require corresponding envir
 
 The backend will fetch and parse iCal files from the configured URLs and provide the next 20 upcoming events per calendar.
 
-## Content Configuration (template.json)
+## Content Configuration (template.yaml)
 
-The application's navigation structure, pages, and content sources are configured via `template.json` in the `FILES_DIR` directory. This file defines what appears in the navigation and how content is displayed.
+The application's navigation structure, pages, and content sources are configured via `template.yaml` (or `template.yml`) in the `FILES_DIR` directory. This file defines what appears in the navigation and how content is displayed. The backend will fall back to `template.json` if no YAML file is present.
 
-**Location:** `${FILES_DIR}/template.json` (e.g., `/mnt/hsf-kiosk-files/template.json`)
+**Location:** `${FILES_DIR}/template.yaml` (or `template.yml`) (e.g., `/mnt/hsf-kiosk-files/template.yaml`)
 
-**Example:** See [scripts/template.json.example](scripts/template.json.example) for a complete reference.
+**Example:** See [scripts/template.yaml.example](scripts/template.yaml.example) for a complete reference.
 
 ### Page Types
 
@@ -389,7 +382,7 @@ Security note: Keep `TICKETS_API_TOKEN` server-side only in backend `.env`. Do n
 
 ### Complete Example
 
-See [scripts/template.json.example](scripts/template.json.example) for a full working example with multiple page types.
+See [scripts/template.yaml.example](scripts/template.yaml.example) for a full working example with multiple page types.
 
 ## Scripts
 

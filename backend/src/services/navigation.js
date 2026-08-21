@@ -1,17 +1,36 @@
 import fs from 'fs';
 import path from 'path';
+import * as yaml from 'js-yaml';
 
 import { buildDocumentFileData } from '../lib/content-utils.js';
 import { fetchCalendarEvents, flattenCalendarEvents } from './calendar.js';
 import { fetchTickets } from './tickets.js';
 
 function loadTemplateData(filesDir) {
-	const templatePath = path.join(filesDir, 'template.json');
-	if (!fs.existsSync(templatePath)) {
+	const yamlPath = path.join(filesDir, 'template.yaml');
+	const yamlPath2 = path.join(filesDir, 'template.yml');
+	const jsonPath = path.join(filesDir, 'template.json');
+
+	try {
+		if (fs.existsSync(yamlPath)) {
+			const data = yaml.load(fs.readFileSync(yamlPath, 'utf8'));
+			return Array.isArray(data) ? data : [];
+		}
+
+		if (fs.existsSync(yamlPath2)) {
+			const data = yaml.load(fs.readFileSync(yamlPath2, 'utf8'));
+			return Array.isArray(data) ? data : [];
+		}
+	} catch (err) {
+		console.error('Failed to parse template YAML:', err);
 		return [];
 	}
 
-	return JSON.parse(fs.readFileSync(templatePath, 'utf8'));
+	if (!fs.existsSync(jsonPath)) {
+		return [];
+	}
+
+	return JSON.parse(fs.readFileSync(jsonPath, 'utf8'));
 }
 
 function buildCalendarResponse(entry, templateData, calendarEvents) {
