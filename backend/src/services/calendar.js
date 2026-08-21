@@ -30,6 +30,18 @@ function mapUpcomingEvents(events, now, limit, includeDescription, includeOrgani
 		});
 }
 
+export function flattenCalendarEvents(calendarGroups = []) {
+	return (calendarGroups || [])
+		.filter((calendar) => calendar && !calendar.error && Array.isArray(calendar.events))
+		.flatMap((calendar) =>
+			calendar.events.map((event) => ({
+				...event,
+				calendar: calendar.name || null
+			}))
+		)
+		.sort((a, b) => new Date(a.start) - new Date(b.start));
+}
+
 async function fetchUpcomingEventsFromUrl(calendarUrl, options = {}) {
 	const {
 		limit = 10,

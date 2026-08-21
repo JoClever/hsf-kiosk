@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { buildDocumentFileData } from '../lib/content-utils.js';
-import { fetchCalendarEvents } from './calendar.js';
+import { fetchCalendarEvents, flattenCalendarEvents } from './calendar.js';
 import { fetchTickets } from './tickets.js';
 
 function loadTemplateData(filesDir) {
@@ -21,7 +21,8 @@ function buildCalendarResponse(entry, templateData, calendarEvents) {
 		type: 'calendar',
 		url: entry.url || null,
 		icon: entry.icon || null,
-		calendars: calendarEvents
+		calendars: calendarEvents,
+		events: flattenCalendarEvents(calendarEvents)
 	};
 }
 
