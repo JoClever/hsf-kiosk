@@ -219,9 +219,9 @@ FILES_DIR=/mnt/hsf-kiosk-files
 CALENDAR_HSF=
 CALENDAR_EVENTS=
 
-# Tickets API (configured in template.yaml with url_env/token_env)
-TICKETS_API_URL=
-TICKETS_API_TOKEN=
+# Zammad API (configured in template.yaml with url_env/token_env)
+ZAMMAD_API_URL=
+ZAMMAD_API_TOKEN=
 ```
 
 Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path must be where your files mount is available (WebDAV/NFS/SMB).
@@ -348,37 +348,44 @@ If using `url_env`, set the corresponding variable in `backend/.env`:
 CALENDAR_EVENTS=https://example.com/private-calendar.ics
 ```
 
-#### 4. Tickets Page (`type: "tickets"`)
+#### 4. Zammad Page (`type: "zammad"`)
 
-Displays open tickets from a REST API via backend proxy.
+Displays open Zammad tickets from the backend proxy.
 
 ```json
 {
   "id": "offene-tickets",
   "display_name": "Offene Tickets",
-  "type": "tickets",
+  "type": "zammad",
   "icon": "todo-list",
   "source_name": "Zammad",
-  "url_env": "TICKETS_API_URL",
-  "token_env": "TICKETS_API_TOKEN",
-  "open_state_ids": [1, 2, 3, 7, 8],
+  "url_env": "ZAMMAD_API_URL",
+  "token_env": "ZAMMAD_API_TOKEN",
+  "state_ids": [1, 2, 3, 7, 8],
+  "assignee_ids": [5],
+  "group_ids": [2],
+  "priority_ids": [1],
   "limit": 25
 }
 ```
 
-- `url` or `url_env`: Ticket API endpoint
+- `url` or `url_env`: Zammad API base URL or tickets endpoint
 - `token_env`: Environment variable containing API token (Authorization: `Token token=...`)
-- `open_state_ids` (optional): Restrict open tickets by `state_id`; if omitted, all tickets without `close_at` are treated as open
+- `state_ids` (optional): Restrict tickets by `state_id`; if omitted, all tickets without `close_at` are treated as open
+- `assignee_ids` (optional): Restrict tickets by `owner_id`
+- `group_ids` (optional): Restrict tickets by `group_id`
+- `priority_ids` (optional): Restrict tickets by `priority_id`
+- `search` (optional): Filter by title, number, assignee, group, priority, organization, customer, or tags
 - `limit` (optional): Max number of tickets returned (default 25)
 
 If `url_env` and `token_env` are used, set them in `backend/.env`:
 
 ```bash
-TICKETS_API_URL=https://todo.hsfev.duckdns.org/api/v1/tickets
-TICKETS_API_TOKEN=your-secret-token
+ZAMMAD_API_URL=https://todo.hsfev.duckdns.org/api/v1
+ZAMMAD_API_TOKEN=your-secret-token
 ```
 
-Security note: Keep `TICKETS_API_TOKEN` server-side only in backend `.env`. Do not put ticket tokens into frontend `VITE_*` variables.
+Security note: Keep `ZAMMAD_API_TOKEN` server-side only in backend `.env`. Do not put ticket tokens into frontend `VITE_*` variables.
 
 ### Complete Example
 

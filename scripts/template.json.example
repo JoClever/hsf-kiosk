@@ -84,15 +84,24 @@
 	{
 		"id": "offene-tickets",
 		"display_name": "Offene Tickets",
-		"type": "tickets",
+		"type": "zammad",
 		"icon": "todo-list",
 		"source_name": "Zammad",
-		"url_env": "TICKETS_API_URL",
-		"token_env": "TICKETS_API_TOKEN",
-		"open_state_ids": [
+		"url_env": "ZAMMAD_API_URL",
+		"token_env": "ZAMMAD_API_TOKEN",
+		"state_ids": [
 			1,
 			2,
 			3
+		],
+		"assignee_ids": [
+			5
+		],
+		"group_ids": [
+			2
+		],
+		"priority_ids": [
+			1
 		],
 		"limit": 25
 	}

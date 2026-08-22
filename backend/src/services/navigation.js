@@ -4,7 +4,7 @@ import * as yaml from 'js-yaml';
 
 import { buildDocumentFileData } from '../lib/content-utils.js';
 import { fetchCalendarEvents, flattenCalendarEvents } from './calendar.js';
-import { fetchTickets } from './tickets.js';
+import { fetchZammadTickets } from './zammad.js';
 
 function loadTemplateData(filesDir) {
 	const yamlPath = path.join(filesDir, 'template.yaml');
@@ -47,11 +47,12 @@ function buildCalendarResponse(entry, templateData, calendarEvents) {
 
 function buildTicketsResponse(entry, templateData, ticketData) {
 	return {
-		id: entry.id || `tickets-${templateData.indexOf(entry)}`,
+		id: entry.id || `zammad-${templateData.indexOf(entry)}`,
 		display_name: entry.display_name,
-		type: 'tickets',
+		type: 'zammad',
 		icon: entry.icon || null,
 		source_name: ticketData.source_name,
+		filters: ticketData.filters || null,
 		tickets: ticketData.tickets,
 		error: ticketData.error || null
 	};
@@ -74,8 +75,8 @@ async function buildEntryResponse(entry, templateData, filesDir) {
 		return buildCalendarResponse(entry, templateData, calendarEvents);
 	}
 
-	if (entry.type === 'tickets') {
-		const ticketData = await fetchTickets(entry);
+	if (entry.type === 'zammad' || entry.type === 'tickets') {
+		const ticketData = await fetchZammadTickets(entry);
 		return buildTicketsResponse(entry, templateData, ticketData);
 	}
 

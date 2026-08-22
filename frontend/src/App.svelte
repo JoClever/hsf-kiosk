@@ -45,7 +45,7 @@
 						<CalendarFrame page={category} />
 					{/if}
 				{/if}
-				{#if category.type === "tickets"}
+				{#if category.type === "zammad"}
 					{#if activeCat?.display_name === category.display_name}
 						<TicketsFrame page={category} />
 					{/if}
