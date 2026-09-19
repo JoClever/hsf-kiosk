@@ -22,6 +22,7 @@ export APP_NAME=${APP_NAME:-hsf-kiosk}
 export BACKEND_DIR=${BACKEND_DIR:-/opt/${APP_NAME}}
 export FRONTEND_DIR=${FRONTEND_DIR:-/srv/${APP_NAME}}
 export FILES_DIR=${FILES_DIR:-/mnt/${APP_NAME}-files}
+export LOGS_DIR=${LOGS_DIR:-/var/log/${APP_NAME}}
 export NGINXCONF_DIR=${NGINXCONF_DIR:-/etc/nginx/conf.d}
 export NGINX_PORT=${NGINX_PORT:-80}
 export NODE_PORT=${NODE_PORT:-3000}
