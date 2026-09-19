@@ -214,8 +214,8 @@ async function fetchTicketTags(baseUrl, token, ticketId, fetchImpl = fetch) {
 
 export async function fetchZammadTickets(entry, fetchImpl = fetch) {
 	try {
-		const ticketUrl = entry.url;
-		const ticketToken = entry.token;
+		const ticketUrl = entry.url || (entry.url_env ? process.env[entry.url_env] : undefined);
+		const ticketToken = entry.token || (entry.token_env ? process.env[entry.token_env] : undefined);
 
 		if (!ticketUrl) {
 			return {

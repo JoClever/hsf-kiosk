@@ -1,7 +1,39 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 
-import { filterZammadTickets } from './zammad.js';
+import { fetchZammadTickets, filterZammadTickets } from './zammad.js';
+
+test('fetchZammadTickets resolves URL and token from environment variables', async () => {
+	const previousUrl = process.env.TEST_ZAMMAD_URL;
+	const previousToken = process.env.TEST_ZAMMAD_TOKEN;
+	process.env.TEST_ZAMMAD_URL = 'https://zammad.example.test/api/v1';
+	process.env.TEST_ZAMMAD_TOKEN = 'test-token';
+
+	const requests = [];
+	const fetchImpl = async (url, options) => {
+		requests.push({ url, options });
+		return {
+			ok: true,
+			json: async () => []
+		};
+	};
+
+	try {
+		const result = await fetchZammadTickets(
+			{ source_name: 'Test', url_env: 'TEST_ZAMMAD_URL', token_env: 'TEST_ZAMMAD_TOKEN' },
+			fetchImpl
+		);
+
+		assert.deepEqual(result.tickets, []);
+		assert.equal(requests[0].url, 'https://zammad.example.test/api/v1/tickets');
+		assert.equal(requests[0].options.headers.Authorization, 'Token token=test-token');
+	} finally {
+		if (previousUrl === undefined) delete process.env.TEST_ZAMMAD_URL;
+		else process.env.TEST_ZAMMAD_URL = previousUrl;
+		if (previousToken === undefined) delete process.env.TEST_ZAMMAD_TOKEN;
+		else process.env.TEST_ZAMMAD_TOKEN = previousToken;
+	}
+});
 
 test('filterZammadTickets filters by open state, assignee, group, and priority', () => {
 	const tickets = [

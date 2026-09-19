@@ -26,6 +26,12 @@ export NGINXCONF_DIR=${NGINXCONF_DIR:-/etc/nginx/conf.d}
 export NGINX_PORT=${NGINX_PORT:-80}
 export NODE_PORT=${NODE_PORT:-3000}
 export SERVER_NAME=${SERVER_NAME:-your-domain.com}
+export SCREENSAVER_UPSTREAM=${SCREENSAVER_UPSTREAM:-}
+
+if [ -z "$SCREENSAVER_UPSTREAM" ]; then
+    echo "❌ SCREENSAVER_UPSTREAM is required"
+    exit 1
+fi
 
 echo "🚀 Deploying ${APP_NAME}..."
 
@@ -46,7 +52,7 @@ sudo mkdir -p "$FRONTEND_DIR" "$BACKEND_DIR" "$FILES_DIR"
 echo ""
 echo "📦 Building frontend..."
 cd frontend
-npm run build
+VITE_API_BASE_URL=/api/ VITE_SCREENSAVER_URL=/screensaver/ npm run build
 cd ..
 
 # Sync built frontend to target
@@ -59,6 +65,26 @@ echo ""
 echo "🚚 Syncing backend to $BACKEND_DIR..."
 sudo rsync -a backend/ "$BACKEND_DIR"/ --exclude node_modules
 
+echo "🔐 Installing backend runtime environment..."
+BACKEND_ENV_FILE="$(mktemp)"
+cat > "$BACKEND_ENV_FILE" <<EOF
+PORT=${NODE_PORT}
+NODE_ENV=production
+FILES_DIR=${FILES_DIR}
+EOF
+while IFS= read -r variable; do
+    if [ -n "${!variable:-}" ]; then
+        printf '%s=%s\n' "$variable" "${!variable}" >> "$BACKEND_ENV_FILE"
+    fi
+done <<'EOF'
+CALENDAR_HSF
+CALENDAR_EVENTS
+ZAMMAD_API_URL
+ZAMMAD_API_TOKEN
+EOF
+sudo install -o nginx -g nginx -m 600 "$BACKEND_ENV_FILE" "$BACKEND_DIR/.env"
+rm "$BACKEND_ENV_FILE"
+
 # Install backend dependencies
 echo ""
 echo "📦 Installing backend dependencies..."
@@ -70,7 +96,7 @@ cd "$ROOT_DIR"
 echo ""
 echo "📋 Rendering NGINX configuration..."
 TMP_NGINX_CONF="$(mktemp)"
-envsubst '$NGINX_PORT $SERVER_NAME $FRONTEND_DIR $NODE_PORT $NGINXCONF_DIR $FILES_DIR' < scripts/nginx.conf > "$TMP_NGINX_CONF"
+envsubst '$NGINX_PORT $SERVER_NAME $FRONTEND_DIR $NODE_PORT $FILES_DIR $SCREENSAVER_UPSTREAM' < scripts/nginx.conf > "$TMP_NGINX_CONF"
 sudo cp "$TMP_NGINX_CONF" ${NGINXCONF_DIR}/${APP_NAME}.conf
 rm "$TMP_NGINX_CONF"
 echo "✅ NGINX configuration copied to ${NGINXCONF_DIR}/${APP_NAME}.conf"

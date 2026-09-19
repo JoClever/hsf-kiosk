@@ -13,6 +13,7 @@
     "dev:backend": "cd backend && npm run dev",
     "build": "npm run build:frontend",
     "build:frontend": "cd frontend && npm run build",
+    "test": "cd backend && npm test",
     "start": "npm run start:backend",
     "start:nginx": "concurrently \"npm run start:backend\" \"npm run build:frontend\"",
     "start:backend": "cd backend && npm start",

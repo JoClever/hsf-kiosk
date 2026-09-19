@@ -112,9 +112,19 @@ FILES_DIR=/mnt/${APP_NAME}-files
 NGINX_PORT=80
 NODE_PORT=3000
 SERVER_NAME=your-domain.com
+SCREENSAVER_UPSTREAM=https://magicmirror.example.com/
 ```
 
-Defaults are used if variables are absent.
+The root `.env` is used only by deployment. `SCREENSAVER_UPSTREAM` is required and is proxied by NGINX at `/screensaver/`.
+
+Frontend production values are deliberately fixed by the deploy script to:
+
+```plaintext
+VITE_API_BASE_URL=/api/
+VITE_SCREENSAVER_URL=/screensaver/
+```
+
+Do not put secrets in `frontend/.env`, because every `VITE_*` value is embedded in the browser bundle.
 
 **Files mount:** `FILES_DIR` should point to the mounted content location (WebDAV, NFS, or SMB). Mount it before deploying so the backend can read `template.yaml` (or `template.yml`; JSON fallback) and files.
 
@@ -132,11 +142,12 @@ Defaults are used if variables are absent.
 
 This script will:
 
-1. Load `.env` (or defaults) for directories and ports
-2. Build the frontend
+1. Load the root `.env` for deployment, proxy, calendar, and Zammad values
+2. Build the frontend with same-origin `/api/` and `/screensaver/` URLs
 3. Sync frontend to `$FRONTEND_DIR` and backend to `$BACKEND_DIR`
-4. Render `nginx.conf` with `envsubst` and install it as `/etc/nginx/sites-available/$APP_NAME`
-5. Test and reload NGINX
+4. Install a filtered backend runtime `.env` at `$BACKEND_DIR/.env`
+5. Render `nginx.conf` with `envsubst` and install it in NGINX
+6. Test and reload NGINX, then restart the backend service
 
 ### Update Procedure (production)
 
@@ -199,15 +210,18 @@ The NGINX configuration file (`scripts/nginx.conf`) includes:
 
 - Static file serving for the frontend
 - Reverse proxy for the backend API at `/api/`
+- Reverse proxy for the MagicMirror screensaver at `/screensaver/`
 - Gzip compression
 - Security headers
 - Static asset caching
 
-**Important:** Update `server_name` in `scripts/nginx.conf` with your actual domain.
+**Important:** Set `SERVER_NAME` and `SCREENSAVER_UPSTREAM` in the root `.env`. MagicMirror must support being served below the `/screensaver/` path, including its asset and WebSocket URLs.
 
 ## Environment Variables
 
-### Backend (.env)
+### Backend runtime environment
+
+For local development, copy `backend/.env.example` to `backend/.env`. In production, `scripts/deploy.sh` creates `$BACKEND_DIR/.env` from the backend-related values in the root `.env`.
 
 ```plaintext
 PORT=3000
@@ -224,7 +238,7 @@ ZAMMAD_API_URL=
 ZAMMAD_API_TOKEN=
 ```
 
-Ensure `backend/.env` `FILES_DIR` matches the root `.env` `FILES_DIR`. This path must be where your files mount is available (WebDAV/NFS/SMB).
+`FILES_DIR` must point to the mounted content location (WebDAV/NFS/SMB). The deploy script keeps it aligned with the root deployment configuration.
 
 ### Calendar Configuration
 
