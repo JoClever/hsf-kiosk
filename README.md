@@ -113,15 +113,16 @@ NGINX_PORT=80
 NODE_PORT=3000
 SERVER_NAME=your-domain.com
 SCREENSAVER_UPSTREAM=https://magicmirror.example.com/
+SCREENSAVER_SERVER_NAME=screensaver.your-domain.com
 ```
 
-The root `.env` is used only by deployment. `SCREENSAVER_UPSTREAM` is required and is proxied by NGINX at `/screensaver/`.
+The root `.env` is used by deployment. `SCREENSAVER_UPSTREAM` is required and is embedded as the public iframe URL in the frontend bundle. It is not proxied by NGINX.
 
 Frontend production values are deliberately fixed by the deploy script to:
 
 ```plaintext
 VITE_API_BASE_URL=/api/
-VITE_SCREENSAVER_URL=/screensaver/
+VITE_SCREENSAVER_URL=https://magicmirror.your-domain.com/
 ```
 
 Do not put secrets in `frontend/.env`, because every `VITE_*` value is embedded in the browser bundle.
@@ -143,7 +144,7 @@ Do not put secrets in `frontend/.env`, because every `VITE_*` value is embedded 
 This script will:
 
 1. Load the root `.env` for deployment, proxy, calendar, and Zammad values
-2. Build the frontend with same-origin `/api/` and `/screensaver/` URLs
+2. Build the frontend with same-origin `/api/` and the configured public screensaver URL
 3. Sync frontend to `$FRONTEND_DIR` and backend to `$BACKEND_DIR`
 4. Install a filtered backend runtime `.env` at `$BACKEND_DIR/.env`
 5. Render `nginx.conf` with `envsubst` and install it in NGINX
@@ -210,12 +211,11 @@ The NGINX configuration file (`scripts/nginx.conf`) includes:
 
 - Static file serving for the frontend
 - Reverse proxy for the backend API at `/api/`
-- Reverse proxy for the MagicMirror screensaver at `/screensaver/`
 - Gzip compression
 - Security headers
 - Static asset caching
 
-**Important:** Set `SERVER_NAME` and `SCREENSAVER_UPSTREAM` in the root `.env`. MagicMirror must support being served below the `/screensaver/` path, including its asset and WebSocket URLs.
+**Important:** Set `SERVER_NAME` and `SCREENSAVER_UPSTREAM` in the root `.env`. MagicMirror must allow framing by `https://${SERVER_NAME}` and expose all assets and Socket.IO endpoints from its public root URL.
 
 ## Environment Variables
 

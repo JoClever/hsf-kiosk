@@ -33,6 +33,14 @@ if [ -z "$SCREENSAVER_UPSTREAM" ]; then
     exit 1
 fi
 
+case "$SCREENSAVER_UPSTREAM" in
+    https://*) ;;
+    *)
+        echo "❌ SCREENSAVER_UPSTREAM must use HTTPS for direct iframe embedding"
+        exit 1
+        ;;
+esac
+
 echo "🚀 Deploying ${APP_NAME}..."
 
 # Check if nginx is installed
@@ -52,7 +60,7 @@ sudo mkdir -p "$FRONTEND_DIR" "$BACKEND_DIR" "$FILES_DIR"
 echo ""
 echo "📦 Building frontend..."
 cd frontend
-VITE_API_BASE_URL=/api/ VITE_SCREENSAVER_URL=/screensaver/ npm run build
+VITE_API_BASE_URL=/api/ VITE_SCREENSAVER_URL="${SCREENSAVER_UPSTREAM}" npm run build
 cd ..
 
 # Sync built frontend to target
@@ -96,7 +104,7 @@ cd "$ROOT_DIR"
 echo ""
 echo "📋 Rendering NGINX configuration..."
 TMP_NGINX_CONF="$(mktemp)"
-envsubst '$NGINX_PORT $SERVER_NAME $FRONTEND_DIR $NODE_PORT $FILES_DIR $SCREENSAVER_UPSTREAM' < scripts/nginx.conf > "$TMP_NGINX_CONF"
+envsubst '$NGINX_PORT $SERVER_NAME $FRONTEND_DIR $NODE_PORT $FILES_DIR' < scripts/nginx.conf > "$TMP_NGINX_CONF"
 sudo cp "$TMP_NGINX_CONF" ${NGINXCONF_DIR}/${APP_NAME}.conf
 rm "$TMP_NGINX_CONF"
 echo "✅ NGINX configuration copied to ${NGINXCONF_DIR}/${APP_NAME}.conf"
